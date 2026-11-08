@@ -8,7 +8,7 @@ Woodpecker Harness 客户端的可选运行依赖。装好客户端后按需下�
 
 | 平台 | 包 | 状态 |
 |---|---|---|
-| Windows 10/11 x64 | `primary-runtime-win32-x64-0.2.0-rc.2.zip` | **未在真机验证**，见下方说明 |
+| Windows 10/11 x64 | `primary-runtime-win32-x64-0.2.0-rc.2.zip` | **已在真机验证通过**（2026-11-08），见下方说明 |
 | macOS（Apple 芯片） | 暂无 | 走内部地址分发，不在本仓 |
 
 ## Windows 安装步骤
@@ -47,28 +47,42 @@ Woodpecker Harness 客户端的可选运行依赖。装好客户端后按需下�
 
 LibreOffice 渲染引擎不在此包内——它已经随 Windows 安装包一起分发。
 
-## 未验证说明
+## 验证情况
 
-这个包是在 macOS 上交叉组装的（Windows 版 Python + PyPI 的 `win_amd64` wheel），**没有在真实的 Windows 机器上完整跑过一次 Office 生成流程**。
+**已在真实 Windows 机器上验证通过（2026-11-08）**，覆盖：
 
-已经核对过的：
+| 测试 | 结果 |
+|---|---|
+| 包内 Python / Node 直接运行 | ✅ Python 3.12.10、Node 24.21.0 |
+| 全部 Python 库导入 | ✅ docx / pptx / openpyxl / PIL / lxml / xlsxwriter |
+| 生成 docx（中文标题、正文、3×3 表格） | ✅ |
+| `check_office.py` 结构校验 | ✅ verdict: pass |
+| python-docx 读回中文文本 | ✅ 无乱码 |
+| xlsx / pptx 生成与校验 | ✅ pass |
+| LibreOffice Kit docx → PDF / PNG | ✅ 转换与渲染正常，中文与表格无异常 |
+| 客户端带运行时完整启动 | ✅ 无 fatal、无 deps-missing |
 
-- 目录结构符合客户端校验（`runtime.json`、`python.exe`、`Lib\site-packages` 三项齐备）
-- `python.exe`、`python312.dll`、`node.exe` 均为 PE32+ x86-64
-- `python312._pth` 已加入 `Lib\site-packages` 并启用 `import site`
-- 包内无任何内部主机名或密钥
+### 已知问题
 
-没核对过的：实际执行 `python.exe -c "import docx"` 以及文档生成、PDF 转换。
+**1. 系统 VC++ 运行库过旧时 PDF 转换会崩溃**
 
-遇到问题请把日志发出来：
+现象：转 PDF 时进程以 `0xC0000005` 退出，事件日志指向 `MSVCP140.dll`。
+原因：包内 LibreOffice 26.8 引擎需要 VC++ 运行库 14.4x 以上，而旧系统可能只有 14.29（2020 年版）。
 
-```
-%USERPROFILE%\.woodpecker\logs\host.log
-```
+解决（任选其一）：
+
+- **推荐**：装微软官方最新 VC++ 2015-2022 x64 运行库 <https://aka.ms/vs/17/release/vc_redist.x64.exe>，系统级生效
+- 应急：从任意自带新版运行库的程序（如 Edge）复制 `msvcp140.dll`、`msvcp140_codecvt_ids.dll`、`vcruntime140.dll`、`vcruntime140_1.dll`、`concrt140.dll` 到
+  `...\resources\runtime\dsh\node_modules\@deepseek-ai\libreoffice-kit-win32-x64\bin\`
+
+**2. 目录内必须有 `dependencies/node/node_modules`**
+
+宿主启动时会校验该目录为目录类型，缺失会报 `primary runtime: expected directory`。
+早期版本的 zip 漏了这个空目录，已在 2026-11-08 重打包补上（现在包内带 `README.txt` 占位）。
 
 ## 校验值
 
 ```
-0ddca1a871b9305563303435ed65682b14f1b152e038e1d86ef2d22d204ec9cc  primary-runtime-win32-x64-0.2.0-rc.2.zip
+819874da8730e151bce99d0ac882d7c94bd508a82d3d944cbd58e282bdee7168  primary-runtime-win32-x64-0.2.0-rc.2.zip
 a3789af8a6b486dad93a3d728b414cefe0ee8eaf81d954b561e921be54d09086  primary-runtime-win32-x64-0.2.0-rc.2.tar.zst
 ```

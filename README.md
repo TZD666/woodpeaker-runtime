@@ -14,7 +14,7 @@ Woodpecker Harness 客户端的可选运行依赖。装好客户端后按需下�
 ## Windows 安装步骤
 
 1. 下载 `primary-runtime-win32-x64-0.2.0-rc.2.zip`（约 56 MB）
-2. 解压，得到 `primary-runtime` 文件夹
+2. 解压，得到 `dsh-primary-runtime` 文件夹
 3. 把它整个移动到：
 
    ```
@@ -24,11 +24,11 @@ Woodpecker Harness 客户端的可选运行依赖。装好客户端后按需下�
    移动完成后路径应当是：
 
    ```
-   C:\Users\<你的用户名>\.woodpecker\dsh-runtimes\primary-runtime\runtime.json
+   C:\Users\<你的用户名>\.woodpecker\dsh-runtimes\dsh-primary-runtime\runtime.json
    ```
 
-   > 注意：客户端读取的目录名固定为 `primary-runtime`，不要改名。
-   > 如果该目录下已有 `dsh-primary-runtime`，说明客户端自己下过一份，先把旧的删掉。
+   > 注意：目录名必须是 `dsh-primary-runtime`，**不是** `primary-runtime`——客户端只认前一个名字。
+   > 如果该目录已存在，说明客户端自己下过一份，删掉旧的再放新的。
 
 4. 重启 Woodpecker Harness。左上角菜单 →「诊断信息」里应显示运行时正常；也可以直接让 agent 生成一个 docx 试试。
 
@@ -69,6 +69,6 @@ LibreOffice 渲染引擎不在此包内——它已经随 Windows 安装包一�
 ## 校验值
 
 ```
-2c2cc8905f8a091b7b248f7bcc5ce9627136f20a49013cbba4346377d44d96f6  primary-runtime-win32-x64-0.2.0-rc.2.zip
+0ddca1a871b9305563303435ed65682b14f1b152e038e1d86ef2d22d204ec9cc  primary-runtime-win32-x64-0.2.0-rc.2.zip
 a3789af8a6b486dad93a3d728b414cefe0ee8eaf81d954b561e921be54d09086  primary-runtime-win32-x64-0.2.0-rc.2.tar.zst
 ```
